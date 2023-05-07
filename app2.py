@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-
 import altair as alt
 import duckdb
 
@@ -13,8 +12,7 @@ query="""
 """
 Countries=list(con.execute(query).df().columns)[2:]
 
-
-st.subheader('Investingation')
+st.subheader('Investigation')
 
 col1, col2 = st.columns(2)
 
@@ -32,7 +30,6 @@ with col2:
     country1 = st.selectbox('Country 1',Countries)
     country2 = st.selectbox('Country 2',Countries)
 
-
 result_df = con.execute("""
     SELECT 
         *
@@ -41,14 +38,17 @@ result_df = con.execute("""
     """, [kind]).df()
 
 chart1 = alt.Chart(result_df).mark_circle().encode(
-    x = 'date',
-    y = country1,
-).properties(height=300, width=400)
+    x='date',
+    y=alt.Y(country1, title=country1),
+    color=alt.value('blue')
+).properties(width=500, height=300)
 
 chart2 = alt.Chart(result_df).mark_circle().encode(
-    x = 'date',
-    y = country2,
-).properties(height=300, width=400)
+    x='date',
+    y=alt.Y(country2, title=country2),
+    color=alt.value('orange')
+).properties(width=500, height=300)
 
-chart = alt.hconcat(chart1, chart2)
-st.altair_chart(chart, theme="streamlit", use_container_width=True)
+combined_chart = alt.layer(chart1, chart2).resolve_scale(y='independent')
+
+st.altair_chart(combined_chart, use_container_width=True)

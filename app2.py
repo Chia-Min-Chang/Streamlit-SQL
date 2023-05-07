@@ -49,12 +49,6 @@ chart2 = alt.Chart(result_df).mark_circle().encode(
     color=alt.value('orange')
 ).properties(width=500, height=300)
 
-brush = alt.selection_interval(encodings=['x'])
-
-combined_chart = alt.layer(
-    chart1, 
-    chart2, 
-    resolve_scale=alt.ResolveScale(y='independent')
-).add_selection(brush).transform_filter(brush)
+combined_chart = alt.layer(chart1, chart2).resolve_scale(y='independent')
 
 st.altair_chart(combined_chart, use_container_width=True)

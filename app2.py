@@ -1,8 +1,15 @@
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 import pandas as pd
 import streamlit as st
 
 import altair as alt
 import duckdb
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 con = duckdb.connect(database='job.db', read_only=True) 
 
@@ -12,7 +19,6 @@ query="""
    FROM job
 """
 Countries=list(con.execute(query).df().columns)[2:]
-
 
 st.subheader('Investigation')
 
@@ -42,7 +48,7 @@ with col3:
 
     chart = alt.Chart(result_df).mark_line().encode(
         x='date',
-        y=alt.Y(countries, axis=alt.Axis(title='Value'))
+        y=alt.Y(','.join(countries), axis=alt.Axis(title='Value'))
     ).interactive()
 
     st.altair_chart(chart, theme="streamlit", use_container_width=True)

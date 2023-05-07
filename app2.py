@@ -51,4 +51,4 @@ with col3:
         y=alt.Y(','.join(countries), axis=alt.Axis(title='Value'))
     ).interactive()
 
-    st.altair_chart(chart, theme="streamlit", use_container_width=True)
+    st.write(chart)

@@ -1,15 +1,8 @@
-
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
 import pandas as pd
 import streamlit as st
 
 import altair as alt
 import duckdb
-
-import logging
-logging.basicConfig(level=logging.DEBUG)
 
 con = duckdb.connect(database='job.db', read_only=True) 
 
@@ -20,9 +13,10 @@ query="""
 """
 Countries=list(con.execute(query).df().columns)[2:]
 
-st.subheader('Investigation')
 
-col1, col2, col3 = st.columns(3)
+st.subheader('Investingation')
+
+col1, col2 = st.columns(2)
 
 with col1:
     query="""
@@ -34,21 +28,27 @@ with col1:
 
     kinds=con.execute(query).df()
     kind = st.selectbox('Kind of Statistics',kinds)
-
 with col2: 
-    countries = st.multiselect('Countries',Countries)
+    country1 = st.selectbox('Country 1',Countries)
+    country2 = st.selectbox('Country 2',Countries)
 
-with col3:
-    result_df = con.execute(f"""
-        SELECT 
-            date, {','.join(countries)}
-        FROM Job 
-        WHERE variable=?
+
+result_df = con.execute("""
+    SELECT 
+        *
+    FROM Job 
+    WHERE variable=?
     """, [kind]).df()
 
-    chart = alt.Chart(result_df).mark_line().encode(
-        x='date',
-        y=alt.Y(','.join(countries), axis=alt.Axis(title='Value'))
-    ).interactive()
+chart1 = alt.Chart(result_df).mark_circle().encode(
+    x = 'date',
+    y = country1,
+).properties(height=300, width=400)
 
-    st.write(chart)
+chart2 = alt.Chart(result_df).mark_circle().encode(
+    x = 'date',
+    y = country2,
+).properties(height=300, width=400)
+
+chart = alt.hconcat(chart1, chart2)
+st.altair_chart(chart, theme="streamlit", use_container_width=True)
